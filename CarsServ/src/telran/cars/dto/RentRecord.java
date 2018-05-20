@@ -56,6 +56,19 @@ public void setDamages(int damages) {
 public long getLicenseId() {
 	return licenseId;
 }
+
+public void setLicenseId(long licenseId) {
+	this.licenseId = licenseId;
+}
+public void setCarNumber(String carNumber) {
+	this.carNumber = carNumber;
+}
+public void setRentDate(LocalDate rentDate) {
+	this.rentDate = rentDate;
+}
+public void setRentDays(int rentDays) {
+	this.rentDays = rentDays;
+}
 public String getCarNumber() {
 	return carNumber;
 }

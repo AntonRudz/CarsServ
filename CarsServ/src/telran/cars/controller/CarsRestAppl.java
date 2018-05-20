@@ -1,25 +1,31 @@
 package telran.cars.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import telran.cars.model.IRentCompany;
-import telran.cars.model.RentCompanyEmbedded;
 import telran.cars.dto.*;
 
 @SpringBootApplication
+@ComponentScan(basePackages="telran.cars.model")
+@EnableMongoRepositories("telran.cars.mongodb.repo")
 @RestController
 
 public class CarsRestAppl {
-	IRentCompany company = RentCompanyEmbedded.restoreFromFile("cars.data");
+	@Autowired
+	IRentCompany company;
+	//IRentCompany company = RentCompanyEmbedded.restoreFromFile("cars.data");
 
 	@PostMapping(value = CarsApiConstants.ADD_CAR_MODEL)
 	CarsReturnCode addCarModel(@RequestBody Model carModel) {
@@ -66,48 +72,53 @@ public class CarsRestAppl {
 		return company.returnCar(returnCar.getCarNumber(), returnCar.getLicenseId(), returnCar.getReturnDate(),
 				returnCar.getGasTankPercent(), returnCar.getDamages());
 	}
-	@PostMapping(value=CarsApiConstants.REMOVE_CAR)
+
+	@PostMapping(value = CarsApiConstants.REMOVE_CAR)
 	CarsReturnCode removeCar(String carNumber) {
 		return company.removeCar(carNumber);
 	}
-	@PostMapping(value=CarsApiConstants.CLEAR_CARS)
-	List<Car> clearCars(@RequestBody ClearData clear){
+
+	@PostMapping(value = CarsApiConstants.CLEAR_CARS)
+	List<Car> clearCars(@RequestBody ClearData clear) {
 		return company.clear(clear.getCurrentDate(), clear.getDays());
 	}
-	@RequestMapping(value=CarsApiConstants.GET_CAR_DRIVERS)
-	List<Driver> getCarDrivers(String carNumber){
+
+	@RequestMapping(value = CarsApiConstants.GET_CAR_DRIVERS)
+	List<Driver> getCarDrivers(String carNumber) {
 		return company.getCarDrivers(carNumber);
 	}
-	@RequestMapping(value=CarsApiConstants.GET_DRIVER_CARS)
-	List<Car> getDriverCars(String licenseId){
+
+	@RequestMapping(value = CarsApiConstants.GET_DRIVER_CARS)
+	List<Car> getDriverCars(String licenseId) {
 		return company.getDriverCars(Long.parseLong(licenseId));
 	}
-	@RequestMapping(value=CarsApiConstants.GET_ALL_MODELS)
-	List<String> getAllModels(){
+
+	@RequestMapping(value = CarsApiConstants.GET_ALL_MODELS)
+	List<String> getAllModels() {
 		return company.getAllModels();
 	}
-	@RequestMapping(value=CarsApiConstants.GET_ALL_CARS)
-	List<Car> getAllCars(){
-		List<Car> allCars=new ArrayList<>();
-		company.getAllCars().forEach(allCars::add);
-		return allCars;
+
+	@RequestMapping(value = CarsApiConstants.GET_ALL_CARS)
+	List<Car> getAllCars() {
+
+		return company.getAllCars().collect(Collectors.toList());
 	}
-	@RequestMapping(value=CarsApiConstants.GET_ALL_DRIVERS)
-	List<Driver> getAllDrivers(){
-		List<Driver> allDrivers=new ArrayList<>();
-		company.getAllDrivers().forEach(allDrivers::add);
-		return allDrivers;
+
+	@RequestMapping(value = CarsApiConstants.GET_ALL_DRIVERS)
+	List<Driver> getAllDrivers() {
+
+		return company.getAllDrivers().collect(Collectors.toList());
 	}
-	@RequestMapping(value=CarsApiConstants.GET_ALL_RECORDS)
-	List<RentRecord> getAllRecords(){
-		List<RentRecord> allRecords=new ArrayList<>();
-		company.getAllRecords().forEach(allRecords::add);
-		return allRecords;
+
+	@RequestMapping(value = CarsApiConstants.GET_ALL_RECORDS)
+	List<RentRecord> getAllRecords() {
+
+		return company.getAllRecords().collect(Collectors.toList());
 	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(CarsRestAppl.class, args);
 
 	}
-	
 
 }
